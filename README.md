@@ -1,23 +1,31 @@
-# AI Research Tracker
+<div align="center">
 
-A personal tool for tracking, scoring, and summarizing AI research papers. Fetch from arXiv, organize by research direction, and generate reports, dashboards, and NotebookLM-ready documents.
+# paperflow
+
+**Read less. Know more. Write what matters.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![arXiv](https://img.shields.io/badge/source-arXiv-B31B1B.svg)](https://arxiv.org)
+[![NotebookLM](https://img.shields.io/badge/integrates-NotebookLM-4285F4.svg)](https://notebooklm.google.com)
+
+</div>
+
+paperflow is a personal research workflow engine for AI/ML practitioners. It closes the loop from paper discovery to internalized knowledge — because you don't truly understand a paper until you can explain it in your own words.
+
+```
+[arXiv] ──fetch──▶ [Candidates] ──batch──▶ [NotebookLM]
+                        │                        │
+                   review & score          trend analysis
+                        │                        │
+                   [Key Papers] ◀────── identify ┘
+                        │
+                   discuss with LLM
+                        │
+                   [paperflow notes]  ◀── the step that matters
+```
 
 Your paper data and notes are gitignored — each user builds their own collection.
-
-## Features
-
-- **arXiv fetching** with OpenAlex citation enrichment and deduplication
-- **Multi-direction tracking** — ships with Post-Training, World Models, LLM Search & Retrieval, and LLM Recommendation; easily extensible
-- **Automated scoring** based on citations, affiliations, venue, open-source status, and manual importance
-- **Interactive dashboard** (Flask) with paper selection, notes, NotebookLM integration, and briefing export
-- **Static HTML dashboard** for quick browsing without a server
-- **Markdown reports**, highlight lists, and NotebookLM-optimized documents
-- **Candidate review workflow** — fetch, review, ingest, report
-
-## Prerequisites
-
-- Python 3.8+
-- pip
 
 ## Quick Start
 
@@ -33,8 +41,7 @@ make fetch direction=post_training
 make ingest
 
 # Validate data and generate all outputs
-make validate
-make all
+make validate && make all
 
 # Open the static dashboard
 open output/html/dashboard.html
@@ -43,6 +50,39 @@ open output/html/dashboard.html
 make serve
 # -> http://localhost:5001
 ```
+
+## The cognitive workflow
+
+Most research tools solve a discovery problem. paperflow solves a cognition problem.
+
+You can read 50 abstracts a week and absorb almost nothing. Or you can run 50 papers through a structured pipeline — fetch, score, batch-analyze with NotebookLM, deep-read the 2–3 that matter, discuss them with an LLM, and then write notes in your own words — and own the knowledge.
+
+That final step is non-negotiable. *Generation is learning.* The note you write forces you to reconstruct the idea, expose the gaps, and make it yours. paperflow is built around that note, not around the paper.
+
+### How it compares
+
+| Tool | Paper fetching | Workflow stages | Personal notes | arXiv integration |
+|------|---------------|-----------------|----------------|-------------------|
+| **paperflow** | Automated (arXiv) | fetch → score → batch → deep read → notes | Yes (linked to papers) | Native |
+| Zotero | Manual import | Collect + annotate | Yes | Plugin only |
+| Notion/Obsidian | Manual | Notes only | Yes | None |
+| Connected Papers | Discovery only | Discover | No | Partial |
+| paperswithcode | None | Browse leaderboards | No | Partial |
+
+## Features
+
+- **arXiv fetching** with OpenAlex citation enrichment and deduplication
+- **Multi-direction tracking** — ships with Post-Training, World Models, LLM Search & Retrieval, and LLM Recommendation; easily extensible
+- **Automated scoring** based on citations, affiliations, venue, open-source status, and manual importance
+- **Interactive dashboard** (Flask) with paper selection, notes, NotebookLM integration, and briefing export
+- **Static HTML dashboard** for quick browsing without a server
+- **NotebookLM-optimized documents** and highlight lists
+- **Candidate review workflow** — fetch, review, ingest, report
+
+## Prerequisites
+
+- Python 3.8+
+- pip
 
 ## Configuration
 
