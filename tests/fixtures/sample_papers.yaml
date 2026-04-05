@@ -1,0 +1,120 @@
+papers:
+  - id: post_training-2026-t01
+    title: "Test Paper on RLHF Improvements"
+    title_cn: "RLHF improvement test paper"
+    authors:
+      - Alice Smith
+      - Bob Jones
+    affiliations:
+      - OpenAI
+    date: 2026-03-01
+    venue: ICML
+    links:
+      paper: "https://arxiv.org/abs/2026.00001"
+      code: "https://github.com/test/rlhf-improve"
+      blog: ""
+      demo: ""
+    direction: post_training
+    tags:
+      - rlhf
+      - reward-model
+    category: method
+    citations: 150
+    is_open_source: true
+    is_deployed: false
+    core_contribution: "A novel reward model architecture that improves RLHF training stability."
+    summary: "This paper proposes a dual-head reward model that separately evaluates helpfulness and safety. The approach reduces reward hacking by 40% compared to standard reward models."
+    key_results:
+      - "40% reduction in reward hacking"
+      - "15% improvement in human preference win rate"
+    importance: high
+    read_status: read
+
+  - id: world_models-2026-t01
+    title: "Learning Physics from Video"
+    title_cn: "video learning physics"
+    authors:
+      - Carol Zhang
+    affiliations:
+      - Google DeepMind
+    date: 2026-02-15
+    venue: NeurIPS
+    links:
+      paper: "https://arxiv.org/abs/2026.00002"
+      code: ""
+      blog: "https://deepmind.com/blog/physics-video"
+      demo: ""
+    direction: world_models
+    tags:
+      - physics-simulation
+      - video-generation
+    category: method
+    citations: 75
+    is_open_source: false
+    is_deployed: false
+    core_contribution: "A world model that learns intuitive physics from video data."
+    summary: "This work trains a transformer-based world model on large-scale video data to learn physical dynamics. The model can predict object trajectories and interactions."
+    key_results:
+      - "State-of-the-art on PhysBench"
+      - "Generalizes to unseen object types"
+    importance: medium
+    read_status: skimmed
+
+  - id: llm_search_retrieval-2026-t01
+    title: "LLM-Enhanced Dense Retrieval"
+    title_cn: "LLM enhanced dense retrieval"
+    authors:
+      - Dave Wilson
+      - Eve Brown
+    affiliations:
+      - Microsoft Research
+    date: 2026-03-10
+    venue: SIGIR
+    links:
+      paper: "https://arxiv.org/abs/2026.00003"
+      code: "https://github.com/test/llm-retrieval"
+      blog: ""
+      demo: "https://demo.example.com/retrieval"
+    direction: llm_search_retrieval
+    tags:
+      - dense-retrieval
+      - embedding
+    category: system
+    citations: 30
+    is_open_source: true
+    is_deployed: true
+    core_contribution: "A production-ready dense retrieval system powered by LLM-generated embeddings."
+    summary: "This system uses an LLM to generate high-quality query and document embeddings for dense retrieval. It has been deployed in Bing search."
+    key_results:
+      - "12% MRR improvement on MS MARCO"
+      - "Deployed in Bing with 5% CTR improvement"
+    importance: high
+    read_status: deep-read
+
+  - id: post_training-2026-t02
+    title: "Low Score Paper"
+    title_cn: "low score test paper"
+    authors:
+      - Frank Nobody
+    affiliations:
+      - Unknown University
+    date: 2025-01-01
+    venue: ""
+    links:
+      paper: "https://arxiv.org/abs/2025.99999"
+      code: ""
+      blog: ""
+      demo: ""
+    direction: post_training
+    tags:
+      - fine-tuning
+    category: analysis
+    citations: 3
+    is_open_source: false
+    is_deployed: false
+    core_contribution: "A small-scale analysis of fine-tuning techniques."
+    summary: "This paper analyzes various fine-tuning approaches on a limited set of tasks."
+    key_results:
+      - "Comparison of 5 fine-tuning methods"
+    importance: low
+    read_status: unread

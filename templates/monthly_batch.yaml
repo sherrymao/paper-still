@@ -1,0 +1,28 @@
+# Monthly batch entry template
+# Use this to record multiple papers for one direction in a given month
+# File naming: data/{direction}/YYYY-MM.yaml
+
+papers:
+  - id: ""
+    title: ""
+    title_cn: ""
+    authors: []
+    affiliations: []
+    date: 2026-01-01
+    venue: ""
+    links:
+      paper: ""
+      code: ""
+      blog: ""
+      demo: ""
+    direction: ""
+    tags: []
+    category: ""
+    citations: 0
+    is_open_source: false
+    is_deployed: false
+    core_contribution: ""
+    summary: ""
+    key_results: []
+    importance: "medium"
+    read_status: "unread"

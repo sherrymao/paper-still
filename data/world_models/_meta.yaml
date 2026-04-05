@@ -1,0 +1,7 @@
+direction: world_models
+name: World Models
+name_cn: "World Models (world model)"
+description: >
+  Research on learning world models that capture environment dynamics,
+  including video prediction, physics simulation, planning with learned
+  models, and applications in robotics and embodied AI.

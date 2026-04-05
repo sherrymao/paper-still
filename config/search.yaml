@@ -1,0 +1,80 @@
+# Search configuration for paper fetching
+# Each direction has its own arXiv queries and keywords
+
+defaults:
+  max_results: 30
+  time_window_days: 30
+
+directions:
+  post_training:
+    arxiv_categories:
+      - "cat:cs.CL"
+      - "cat:cs.LG"
+      - "cat:cs.AI"
+    keywords:
+      - "RLHF"
+      - "direct preference optimization"
+      - "DPO"
+      - "reward model"
+      - "alignment"
+      - "instruction tuning"
+      - "constitutional AI"
+      - "post-training"
+      - "preference learning"
+      - "reinforcement learning from human feedback"
+
+  world_models:
+    arxiv_categories:
+      - "cat:cs.CV"
+      - "cat:cs.LG"
+      - "cat:cs.AI"
+      - "cat:cs.RO"
+    keywords:
+      - "world model"
+      - "video prediction"
+      - "physics simulation"
+      - "embodied AI"
+      - "video generation"
+      - "3D generation"
+      - "dreamer"
+      - "learned dynamics"
+      - "environment model"
+
+  llm_search_retrieval:
+    arxiv_categories:
+      - "cat:cs.IR"
+      - "cat:cs.CL"
+      - "cat:cs.AI"
+    keywords:
+      - "dense retrieval"
+      - "retrieval augmented generation"
+      - "RAG"
+      - "neural reranking"
+      - "semantic search"
+      - "LLM retrieval"
+      - "query expansion"
+      - "embedding model"
+      - "passage retrieval"
+
+  llm_recommendation:
+    arxiv_categories:
+      - "cat:cs.IR"
+      - "cat:cs.CL"
+      - "cat:cs.AI"
+      - "cat:cs.LG"
+    keywords:
+      - "LLM recommendation"
+      - "large language model recommendation"
+      - "conversational recommendation"
+      - "generative recommendation"
+      - "prompt-based recommendation"
+      - "collaborative filtering LLM"
+      - "sequential recommendation"
+      - "recommendation system language model"
+      - "LLM ranking"
+      - "chat recommendation"
+
+# OpenAlex citation enrichment
+citations:
+  enabled: true
+  batch_delay: 0.1

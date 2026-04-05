@@ -1,0 +1,38 @@
+weights:
+  citation:
+    - range: [0, 10]
+      score: 0
+    - range: [10, 50]
+      score: 5
+    - range: [50, 200]
+      score: 15
+    - range: [200, 999999]
+      score: 30
+
+  open_source: 10
+  deployed: 20
+  notable_affiliation: 15
+  notable_author: 10
+
+  top_venue:
+    venues:
+      - NeurIPS
+      - ICML
+      - ICLR
+      - ACL
+      - EMNLP
+      - CVPR
+      - AAAI
+      - SIGIR
+    score: 10
+
+  manual_importance:
+    high: 25
+    medium: 10
+    low: 0
+
+  recency:
+    within_30_days: 10
+    within_90_days: 5
+
+highlight_threshold: 40

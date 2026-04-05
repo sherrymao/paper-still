@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# === Personal data (each user builds their own collection) ===
+data/*/[0-9]*.yaml
+data/notes.yaml
+data/random_notes.yaml
+data/notebooks.yaml
+data/batches.yaml
+
+# Generated outputs (reproducible from data + code)
+output/
+
+# Claude Code local settings
+.claude/settings.local.json

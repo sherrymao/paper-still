@@ -1,0 +1,7 @@
+direction: llm_recommendation
+name: LLM in Recommendation
+name_cn: "LLM in Recommendation"
+description: >
+  Research on applying large language models to recommendation systems,
+  including conversational recommendation, LLM-based user/item modeling,
+  prompt-based ranking, and integrating generative AI with collaborative filtering.

@@ -1,0 +1,7 @@
+direction: llm_search_retrieval
+name: LLM in Search & Retrieval
+name_cn: "LLM retrieval"
+description: >
+  Research on applying large language models to information retrieval and
+  search, including dense/sparse retrieval, reranking, RAG, query
+  understanding, and semantic search systems.

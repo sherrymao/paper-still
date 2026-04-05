@@ -1,0 +1,26 @@
+# Single paper entry template
+# Copy this template and fill in the fields
+
+- id: "{direction}-2026-{seq}"       # e.g., post_training-2026-001
+  title: ""
+  title_cn: ""
+  authors: []
+  affiliations: []
+  date: 2026-01-01
+  venue: ""
+  links:
+    paper: ""
+    code: ""
+    blog: ""
+    demo: ""
+  direction: ""                       # post_training / world_models / llm_search_retrieval
+  tags: []
+  category: ""                        # method / survey / benchmark / system / analysis
+  citations: 0
+  is_open_source: false
+  is_deployed: false
+  core_contribution: ""
+  summary: ""
+  key_results: []
+  importance: "medium"                # high / medium / low
+  read_status: "unread"               # unread / skimmed / read / deep-read

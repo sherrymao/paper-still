@@ -1,0 +1,8 @@
+direction: post_training
+name: Post-Training
+name_cn: "Post-Training (RLHF/DPO/Alignment)"
+description: >
+  Research on improving language models after pre-training, including
+  reinforcement learning from human feedback (RLHF), direct preference
+  optimization (DPO), constitutional AI, instruction tuning, and alignment
+  techniques.

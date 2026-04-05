@@ -1,0 +1,89 @@
+directions:
+  - post_training
+  - world_models
+  - llm_search_retrieval
+  - llm_recommendation
+
+categories:
+  - method
+  - survey
+  - benchmark
+  - system
+  - analysis
+
+importance_levels:
+  - high
+  - medium
+  - low
+
+read_statuses:
+  - unread
+  - skimmed
+  - read
+  - deep-read
+
+tags:
+  post_training:
+    - rlhf
+    - dpo
+    - ppo
+    - constitutional-ai
+    - reward-model
+    - preference-learning
+    - alignment
+    - instruction-tuning
+    - fine-tuning
+    - safety
+    - evaluation
+    - data-quality
+    - synthetic-data
+    - multi-task
+    - scaling
+
+  world_models:
+    - video-generation
+    - physics-simulation
+    - planning
+    - reinforcement-learning
+    - representation-learning
+    - self-supervised
+    - diffusion
+    - autoregressive
+    - robotics
+    - embodied-ai
+    - game-engine
+    - 3d-generation
+    - temporal-modeling
+
+  llm_search_retrieval:
+    - dense-retrieval
+    - sparse-retrieval
+    - hybrid-retrieval
+    - reranking
+    - query-expansion
+    - rag
+    - embedding
+    - semantic-search
+    - knowledge-graph
+    - passage-retrieval
+    - document-retrieval
+    - multi-modal-retrieval
+    - evaluation
+    - efficiency
+
+  llm_recommendation:
+    - collaborative-filtering
+    - sequential-recommendation
+    - conversational-recommendation
+    - prompt-tuning
+    - user-modeling
+    - item-representation
+    - cold-start
+    - click-through-rate
+    - knowledge-augmented
+    - generative-recommendation
+    - multi-modal
+    - evaluation
+    - semantic-id
+    - generative-retrieval
+    - scaling-up

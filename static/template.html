@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: #1a1a2e; color: white; padding: 30px 0; margin-bottom: 30px; }
+        header .container { display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 1.8rem; }
+        .meta { opacity: 0.7; font-size: 0.9rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 0.85rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-card .value { font-size: 2rem; font-weight: bold; color: #1a1a2e; }
+        .stat-card-direction:hover { box-shadow: 0 2px 8px rgba(233,69,96,0.3); }
+        .stat-card-direction.active { border: 2px solid #e94560; }
+        .stat-card-direction.active h3 { color: #e94560; }
+        .section { margin-bottom: 30px; }
+        .section h2 { font-size: 1.4rem; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .paper-card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .paper-card.highlight { border-left: 4px solid #e94560; }
+        .paper-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+        .paper-title a { color: inherit; text-decoration: none; }
+        .paper-title a:hover { color: #e94560; text-decoration: underline; }
+        .paper-meta { font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+        .paper-meta span { margin-right: 15px; }
+        .paper-summary { font-size: 0.95rem; margin-bottom: 10px; }
+        .paper-links { margin-top: 8px; }
+        .link-btn { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-decoration: none; margin-right: 5px; color: white; }
+        .link-btn-paper { background: #0f3460; }
+        .link-btn-code { background: #16a34a; }
+        .link-btn-blog { background: #ca8a04; }
+        .link-btn-demo { background: #9333ea; }
+        .link-btn:hover { opacity: 0.85; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 5px; }
+        .badge-score { background: #e94560; color: white; }
+        .badge-oss { background: #0f3460; color: white; }
+        .badge-deployed { background: #16213e; color: white; }
+        .badge-tag { background: #e8e8e8; color: #555; }
+        .badge-notebook { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; margin-left: 4px; text-decoration: none; }
+        .badge-notebook-active { background: #16a34a; color: white; cursor: pointer; }
+        .badge-notebook-active:hover { opacity: 0.85; }
+        .badge-notebook-pending { background: #d1d5db; color: #6b7280; cursor: default; }
+        .direction-header { display: flex; justify-content: space-between; align-items: center; }
+        .direction-stats { font-size: 0.85rem; color: #666; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 10px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #1a1a2e; color: white; font-size: 0.85rem; }
+        td { font-size: 0.9rem; }
+        tr:hover { background: #f8f8f8; }
+        td a { color: #1a1a2e; text-decoration: none; }
+        td a:hover { color: #e94560; text-decoration: underline; }
+        .cb-col { width: 35px; text-align: center; }
+        .cb-col input { cursor: pointer; }
+
+        /* Selection toolbar */
+        #selection-toolbar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1a1a2e; color: white; padding: 12px 20px;
+            display: none; align-items: center; gap: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 100;
+        }
+        #selection-toolbar.visible { display: flex; }
+        #selection-toolbar .count { font-weight: 600; min-width: 140px; }
+        #selection-toolbar input[type="text"] {
+            padding: 6px 12px; border: 1px solid #555; border-radius: 4px;
+            background: #2a2a4e; color: white; font-size: 0.9rem; width: 220px;
+        }
+        #selection-toolbar input[type="text"]::placeholder { color: #aaa; }
+        #selection-toolbar button {
+            padding: 8px 16px; border: none; border-radius: 4px;
+            background: #e94560; color: white; font-weight: 600;
+            cursor: pointer; font-size: 0.85rem;
+        }
+        #selection-toolbar button:hover { background: #c73652; }
+
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: none;
+            justify-content: center; align-items: center; z-index: 200;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal {
+            background: white; border-radius: 12px; padding: 30px;
+            max-width: 680px; width: 90%; max-height: 80vh; overflow-y: auto;
+            color: #333; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal h2 { font-size: 1.3rem; margin-bottom: 20px; color: #1a1a2e; }
+        .modal h3 { font-size: 1rem; margin: 18px 0 10px; color: #555; }
+        .modal .step-label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .url-list { list-style: none; padding: 0; }
+        .url-list li {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .url-list li .url-info { flex: 1; min-width: 0; }
+        .url-list li .url-title { font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .url-list li .url-text { color: #666; font-size: 0.8rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-copy {
+            padding: 4px 12px; border: 1px solid #ddd; border-radius: 4px;
+            background: white; cursor: pointer; font-size: 0.8rem; white-space: nowrap; margin-left: 8px;
+        }
+        .btn-copy:hover { background: #f0f0f0; }
+        .btn-copy.copied { background: #16a34a; color: white; border-color: #16a34a; }
+        .btn-action {
+            display: inline-block; padding: 8px 18px; border: none; border-radius: 6px;
+            background: #1a1a2e; color: white; cursor: pointer; font-weight: 600;
+            font-size: 0.9rem; margin-right: 8px; margin-top: 8px;
+        }
+        .btn-action:hover { background: #2a2a4e; }
+        .btn-action.primary { background: #e94560; }
+        .btn-action.primary:hover { background: #c73652; }
+        .btn-close {
+            padding: 8px 18px; border: 1px solid #ddd; border-radius: 6px;
+            background: white; color: #333; cursor: pointer; font-weight: 600;
+            font-size: 0.9rem; margin-top: 8px;
+        }
+        .btn-close:hover { background: #f5f5f5; }
+        .register-row { display: flex; gap: 8px; margin-top: 8px; }
+        .register-row input {
+            flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;
+        }
+        .register-row button {
+            padding: 8px 16px; border: none; border-radius: 6px;
+            background: #16a34a; color: white; font-weight: 600; cursor: pointer;
+        }
+        .register-row button:hover { background: #15803d; }
+        .toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: #1a1a2e; color: white; padding: 10px 24px; border-radius: 8px;
+            font-size: 0.9rem; z-index: 300; opacity: 0; transition: opacity 0.3s;
+        }
+        .toast.visible { opacity: 1; }
+        .msg-success { color: #16a34a; font-weight: 600; margin-top: 8px; font-size: 0.9rem; }
+        .view-tabs { display: flex; align-items: center; gap: 0; margin-bottom: 25px; }
+        .tab {
+            padding: 10px 24px; border: none; background: #e0e0e0; color: #555;
+            font-weight: 600; cursor: pointer; font-size: 0.9rem;
+        }
+        .tab:first-child { border-radius: 6px 0 0 6px; }
+        .tab:last-of-type { border-radius: 0 6px 6px 0; }
+        .tab:only-of-type { border-radius: 6px; }
+        .tab.active { background: #1a1a2e; color: white; }
+        #batch-select {
+            margin-left: 12px; padding: 8px 12px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: 0.9rem; background: white;
+        }
+
+        /* Note styles */
+        .btn-note {
+            background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px;
+            cursor: pointer; font-size: 0.72rem; font-weight: 600;
+            color: #666; padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+        }
+        .btn-note:hover { background: #e8e8e8; color: #e94560; border-color: #e94560; }
+        .btn-note.has-note { background: #0f3460; color: white; border-color: #0f3460; }
+        .note-row td {
+            background: #fafafa; padding: 10px 15px; border-bottom: 1px solid #eee;
+        }
+        .note-row:hover td { background: #fafafa; }
+        .note-row textarea {
+            width: 100%; min-height: 80px; padding: 8px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 0.9rem; font-family: inherit;
+            resize: vertical; line-height: 1.5;
+        }
+        .note-row .note-actions { margin-top: 8px; display: flex; gap: 8px; }
+        .note-row .note-actions button {
+            padding: 5px 14px; border: none; border-radius: 4px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+        .note-row .btn-save-note { background: #1a1a2e; color: white; }
+        .note-row .btn-save-note:hover { background: #2a2a4e; }
+        .note-row .btn-cancel-note { background: #e0e0e0; color: #555; }
+        .note-row .btn-cancel-note:hover { background: #d0d0d0; }
+        .note-display {
+            font-size: 0.85rem; color: #555; font-style: italic;
+            white-space: pre-wrap;
+        }
+
+        /* Random notes tab */
+        .rn-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .rn-filters select, .rn-filters input[type="date"] {
+            padding: 6px 12px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 0.85rem; background: white;
+        }
+        .rn-card {
+            background: white; border-radius: 8px; padding: 20px;
+            margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #ca8a04;
+        }
+        .rn-card .rn-text { white-space: pre-wrap; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.6; }
+        .rn-card .rn-meta { font-size: 0.8rem; color: #999; }
+        .rn-card .rn-tags { margin-top: 6px; }
+        .rn-card .rn-actions { margin-top: 8px; display: flex; gap: 8px; }
+        .rn-card .rn-actions button {
+            padding: 4px 12px; border: none; border-radius: 4px;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+        }
+        .rn-card .btn-rn-edit { background: #e0e0e0; color: #555; }
+        .rn-card .btn-rn-edit:hover { background: #d0d0d0; }
+        .rn-card .btn-rn-delete { background: #fee2e2; color: #dc2626; }
+        .rn-card .btn-rn-delete:hover { background: #fecaca; }
+        .rn-editor { margin-bottom: 20px; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .rn-editor textarea {
+            width: 100%; min-height: 80px; padding: 8px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 0.9rem; font-family: inherit;
+            resize: vertical; line-height: 1.5; margin-bottom: 8px;
+        }
+        .rn-editor input[type="text"] {
+            width: 100%; padding: 6px 10px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px;
+        }
+        .rn-editor .rn-editor-actions { display: flex; gap: 8px; }
+        .rn-editor .rn-editor-actions button {
+            padding: 6px 16px; border: none; border-radius: 4px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-rn-save { background: #1a1a2e; color: white; }
+        .btn-rn-save:hover { background: #2a2a4e; }
+        .btn-rn-cancel { background: #e0e0e0; color: #555; }
+        .btn-rn-cancel:hover { background: #d0d0d0; }
+        .batch-info { font-size: 0.8rem; color: #888; margin-left: 4px; }
+
+        /* Fetch tab */
+        .fetch-form { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .fetch-form h3 { font-size: 1.1rem; margin-bottom: 15px; color: #1a1a2e; }
+        .fetch-form .form-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+        .fetch-form label { font-size: 0.85rem; color: #555; font-weight: 600; min-width: 60px; }
+        .fetch-form select, .fetch-form input[type="text"], .fetch-form input[type="number"] {
+            padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; background: white;
+        }
+        .fetch-form select { min-width: 200px; }
+        .fetch-form input[type="text"] { flex: 1; min-width: 200px; }
+        .fetch-form input[type="number"] { width: 80px; }
+        .btn-fetch {
+            padding: 10px 24px; border: none; border-radius: 6px;
+            background: #e94560; color: white; font-weight: 600; cursor: pointer; font-size: 0.9rem;
+        }
+        .btn-fetch:hover { background: #c73652; }
+        .btn-fetch:disabled { background: #ccc; cursor: not-allowed; }
+        .fetch-status { font-size: 0.9rem; color: #666; margin: 15px 0; }
+        .fetch-results-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0;
+        }
+        .fetch-results-header h2 { font-size: 1.2rem; }
+        .candidate-card {
+            background: white; border-radius: 8px; padding: 18px; margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #0f3460;
+        }
+        .candidate-card.removed { opacity: 0.3; pointer-events: none; }
+        .candidate-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+        .candidate-title a { color: inherit; text-decoration: none; }
+        .candidate-title a:hover { color: #e94560; text-decoration: underline; }
+        .candidate-meta { font-size: 0.82rem; color: #666; margin-bottom: 10px; }
+        .candidate-meta span { margin-right: 12px; }
+        .candidate-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .candidate-fields label { font-size: 0.8rem; color: #555; font-weight: 600; display: block; margin-bottom: 3px; }
+        .candidate-fields textarea {
+            width: 100%; min-height: 50px; padding: 6px 8px; border: 1px solid #ddd;
+            border-radius: 4px; font-size: 0.85rem; font-family: inherit; resize: vertical;
+        }
+        .candidate-fields select, .candidate-fields input[type="text"] {
+            width: 100%; padding: 6px 8px; border: 1px solid #ddd;
+            border-radius: 4px; font-size: 0.85rem;
+        }
+        .candidate-fields .field-full { grid-column: 1 / -1; }
+        .candidate-actions { margin-top: 10px; }
+        .btn-remove {
+            padding: 4px 14px; border: 1px solid #dc2626; border-radius: 4px;
+            background: #fee2e2; color: #dc2626; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-remove:hover { background: #fecaca; }
+        .btn-ingest {
+            padding: 10px 24px; border: none; border-radius: 6px;
+            background: #16a34a; color: white; font-weight: 600; cursor: pointer; font-size: 0.9rem;
+        }
+        .btn-ingest:hover { background: #15803d; }
+        .btn-ingest:disabled { background: #ccc; cursor: not-allowed; }
+        .fetch-loading {
+            text-align: center; padding: 40px; color: #666; font-size: 0.95rem;
+        }
+        .fetch-loading .spinner {
+            display: inline-block; width: 24px; height: 24px; border: 3px solid #ddd;
+            border-top-color: #e94560; border-radius: 50%; animation: spin 0.8s linear infinite;
+            vertical-align: middle; margin-right: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .candidate-oss-row { display: flex; align-items: center; gap: 6px; }
+        .candidate-oss-row input[type="checkbox"] { cursor: pointer; }
+
+        /* Sortable table headers */
+        th.sortable { cursor: pointer; user-select: none; }
+        th.sortable:hover { background: #2a2a4e; }
+        th.sortable .sort-indicator { font-size: 0.7rem; margin-left: 4px; }
+        th.sortable.sort-asc .sort-indicator::after { content: "\25B2"; }
+        th.sortable.sort-desc .sort-indicator::after { content: "\25BC"; }
+
+        /* Score adjustment button */
+        .btn-score-adjust {
+            background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px;
+            cursor: pointer; font-size: 0.72rem; font-weight: 600;
+            color: #666; padding: 2px 8px; margin-left: 4px; vertical-align: middle;
+        }
+        .btn-score-adjust:hover { background: #e8e8e8; color: #e94560; border-color: #e94560; }
+        .btn-score-adjust.has-adj { background: #e94560; color: white; border-color: #e94560; }
+        .score-computed { font-size: 0.72rem; color: #999; margin-left: 4px; }
+        .score-inline-editor { display: inline-flex; align-items: center; gap: 4px; }
+        .score-inline-editor input[type="number"] {
+            width: 60px; padding: 2px 6px; border: 1px solid #ccc; border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .score-inline-editor button {
+            padding: 2px 8px; border: none; border-radius: 4px;
+            font-size: 0.72rem; font-weight: 600; cursor: pointer;
+        }
+        .score-inline-editor .btn-score-save { background: #1a1a2e; color: white; }
+        .score-inline-editor .btn-score-save:hover { background: #2a2a4e; }
+        .score-inline-editor .btn-score-reset { background: #fee2e2; color: #dc2626; }
+        .score-inline-editor .btn-score-reset:hover { background: #fecaca; }
+        .score-inline-editor .btn-score-cancel { background: #e0e0e0; color: #555; }
+        .score-inline-editor .btn-score-cancel:hover { background: #d0d0d0; }
+    </style>
+</head>
+<body>
+    {% macro paper_table_row(p, notes, paper_notebook_map) %}
+    <tr data-paper-id="{{ p.id }}" data-sort-score="{{ '%.1f'|format(p.score) }}" data-sort-date="{{ p.date }}" data-sort-title="{{ p.title | lower | e }}">
+        <td class="cb-col"><input type="checkbox" class="paper-cb" data-id="{{ p.id }}"></td>
+        <td>
+            {% if p.links.paper %}<a href="{{ p.links.paper }}" target="_blank">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}
+            <button class="btn-note {% if notes.get(p.id) %}has-note{% endif %}" data-id="{{ p.id }}" title="Notes">Note</button>
+        </td>
+        <td>{{ p.authors[:2] | join(', ') }}{% if p.authors | length > 2 %}...{% endif %}</td>
+        <td>{{ p.date }}</td>
+        <td class="score-cell" data-paper-id="{{ p.id }}" data-computed="{{ '%.1f'|format(p.computed_score) }}">
+            <span class="score-display">{{ "%.0f"|format(p.score) }}</span>
+            {% if p.score_adjusted %}<span class="score-computed">({{ "%.0f"|format(p.computed_score) }})</span>{% endif %}
+            <button class="btn-score-adjust {% if p.score_adjusted %}has-adj{% endif %}" data-id="{{ p.id }}" title="Adjust score">Adj</button>
+        </td>
+        <td>
+            {% if p.is_open_source %}<span class="badge badge-oss">OSS</span>{% endif %}
+            {% if p.is_deployed %}<span class="badge badge-deployed">Prod</span>{% endif %}
+            {% if p.links.code %}<a href="{{ p.links.code }}" target="_blank" class="link-btn link-btn-code" style="font-size:0.7rem;padding:2px 6px;">Code</a>{% endif %}
+            {% if paper_notebook_map and p.id in paper_notebook_map %}
+                {% for nb in paper_notebook_map[p.id] %}
+                    {% if nb.url %}<a href="{{ nb.url }}" target="_blank" class="badge-notebook badge-notebook-active" title="{{ nb.name }}">NB</a>{% else %}<span class="badge-notebook badge-notebook-pending" title="{{ nb.name }} (no URL yet)">NB</span>{% endif %}
+                {% endfor %}
+            {% endif %}
+        </td>
+    </tr>
+    <tr class="note-row" data-note-id="{{ p.id }}" style="display:none;">
+        <td colspan="6">
+            <div class="note-display" data-note-display="{{ p.id }}" {% if not notes.get(p.id) %}style="display:none;"{% endif %}>{{ notes.get(p.id, '') }}</div>
+            <textarea class="note-textarea" data-note-edit="{{ p.id }}" style="display:none;">{{ notes.get(p.id, '') }}</textarea>
+            <div class="note-actions" data-note-actions="{{ p.id }}" style="display:none;">
+                <button class="btn-save-note" data-id="{{ p.id }}">Save</button>
+                <button class="btn-cancel-note" data-id="{{ p.id }}">Cancel</button>
+            </div>
+        </td>
+    </tr>
+    {% endmacro %}
+
+    <header>
+        <div class="container">
+            <h1>{{ title }}</h1>
+            <div class="meta">Generated: {{ generated }} | Total: {{ total_papers }} papers</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Papers</h3>
+                <div class="value">{{ total_papers }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Highlights</h3>
+                <div class="value">{{ total_highlights }}</div>
+            </div>
+            {% for d, info in directions.items() %}
+            <div class="stat-card stat-card-direction" data-direction="{{ d }}" style="cursor:pointer;">
+                <h3>{{ info.meta.get('name', d) }}</h3>
+                <div class="value">{{ info.count }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="view-tabs">
+            <button class="tab active" data-view="all">All Papers ({{ total_papers }})</button>
+            <button class="tab" data-view="batch">By Fetch</button>
+            <button class="tab" data-view="fetch">Fetch</button>
+            <button class="tab" data-view="notes">My Notes{% if random_notes %} ({{ random_notes | length }}){% endif %}</button>
+            {% set noted_count = notes.values() | select | list | length %}
+            <button class="tab" id="btn-filter-noted" style="margin-left:auto; background:#0f3460; color:white; border-radius:6px;{% if noted_count == 0 %} display:none;{% endif %}">Noted ({{ noted_count }})</button>
+            {% if all_batches %}
+            <select id="batch-select" style="display:none;">
+                {% for b in all_batches %}
+                <option value="{{ b }}">{{ b }}{% if batch_meta.get(b) %} — {{ batch_meta[b].directions | join(', ') }}{% if batch_meta[b].get('query') %} [{{ batch_meta[b].query }}]{% endif %}{% endif %} ({{ batches_data[b].count }} papers)</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+
+        <div id="view-all" class="view-content">
+        {% if highlights %}
+        <div class="section" id="section-highlights">
+            <h2>Highlighted Papers</h2>
+            {% for p in highlights %}
+            <div class="paper-card highlight">
+                <div class="paper-title">
+                    {% if p.links.paper %}<a href="{{ p.links.paper }}" target="_blank">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}
+                    {% if paper_notebook_map and p.id in paper_notebook_map %}
+                        {% for nb in paper_notebook_map[p.id] %}
+                            {% if nb.url %}<a href="{{ nb.url }}" target="_blank" class="badge-notebook badge-notebook-active" title="{{ nb.name }}">NB</a>{% else %}<span class="badge-notebook badge-notebook-pending" title="{{ nb.name }} (no URL yet)">NB</span>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="paper-meta">
+                    <span class="badge badge-score">Score: {{ "%.0f"|format(p.score) }}</span>
+                    {% if p.is_open_source %}<span class="badge badge-oss">Open Source</span>{% endif %}
+                    {% if p.is_deployed %}<span class="badge badge-deployed">Deployed</span>{% endif %}
+                    {% for tag in p.tags[:5] %}<span class="badge badge-tag">{{ tag }}</span>{% endfor %}
+                </div>
+                <div class="paper-meta">
+                    <span>{{ p.authors | join(', ') }}</span>
+                    <span>{{ p.date }}</span>
+                    {% if p.venue %}<span>{{ p.venue }}</span>{% endif %}
+                </div>
+                <div class="paper-summary">{{ p.core_contribution }}</div>
+                <div class="paper-links">
+                    {% if p.links.paper %}<a href="{{ p.links.paper }}" target="_blank" class="link-btn link-btn-paper">Paper</a>{% endif %}
+                    {% if p.links.code %}<a href="{{ p.links.code }}" target="_blank" class="link-btn link-btn-code">Code</a>{% endif %}
+                    {% if p.links.blog %}<a href="{{ p.links.blog }}" target="_blank" class="link-btn link-btn-blog">Blog</a>{% endif %}
+                    {% if p.links.demo %}<a href="{{ p.links.demo }}" target="_blank" class="link-btn link-btn-demo">Demo</a>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% for d, info in directions.items() %}
+        {% if info.papers %}
+        <div class="section" data-direction="{{ d }}">
+            <div class="direction-header">
+                <h2>{{ info.meta.get('name', d) }}</h2>
+                <div class="direction-stats">{{ info.count }} papers | Avg Score: {{ "%.1f"|format(info.avg_score) }} | OSS: {{ info.open_source }} | Deployed: {{ info.deployed }}</div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="cb-col"><input type="checkbox" class="select-all" data-direction="{{ d }}"></th>
+                        <th class="sortable" data-sort-key="title">Title <span class="sort-indicator"></span></th>
+                        <th>Authors</th>
+                        <th class="sortable" data-sort-key="date">Date <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-sort-key="score">Score <span class="sort-indicator"></span></th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in info.papers %}
+                    {{ paper_table_row(p, notes, paper_notebook_map) }}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% endfor %}
+        </div>{# end view-all #}
+
+        <div id="view-batch" class="view-content" style="display:none;">
+            {% if all_batches %}
+                {% for batch in all_batches %}
+                <div class="batch-content" id="batch-{{ batch }}" {% if not loop.first %}style="display:none;"{% endif %}>
+                    <div class="section">
+                        <h2>Fetch: {{ batch }}{% if batch_meta.get(batch) %} <span class="batch-info">{{ batch_meta[batch].directions | join(', ') }}{% if batch_meta[batch].get('query') %} | query: "{{ batch_meta[batch].query }}"{% endif %}</span>{% endif %}</h2>
+                        <p class="direction-stats">{{ batches_data[batch].count }} papers{% if batch_meta.get(batch) %} | Directions: {{ batch_meta[batch].directions | join(', ') }}{% if batch_meta[batch].get('query') %} | Query: {{ batch_meta[batch].query }}{% endif %}{% endif %}</p>
+                    </div>
+                    {% for d, info in batches_data[batch].directions.items() %}
+                    <div class="section">
+                        <div class="direction-header">
+                            <h2>{{ info.meta.get('name', d) }}</h2>
+                            <div class="direction-stats">{{ info.count }} papers</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="cb-col"><input type="checkbox" class="select-all" data-direction="{{ d }}-{{ batch }}"></th>
+                                    <th class="sortable" data-sort-key="title">Title <span class="sort-indicator"></span></th>
+                                    <th>Authors</th>
+                                    <th class="sortable" data-sort-key="date">Date <span class="sort-indicator"></span></th>
+                                    <th class="sortable" data-sort-key="score">Score <span class="sort-indicator"></span></th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in info.papers %}
+                                {{ paper_table_row(p, notes, paper_notebook_map) }}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="padding: 20px; color: #666;">No fetch batches found. Run <code>make fetch</code> + <code>make ingest</code> first.</p>
+            {% endif %}
+        </div>{# end view-batch #}
+
+        <div id="view-fetch" class="view-content" style="display:none;">
+            <div class="fetch-form" style="margin-bottom:12px;">
+                <h3>Add Paper by URL</h3>
+                <div class="form-row">
+                    <label>URL:</label>
+                    <input type="text" id="add-paper-url" placeholder="https://arxiv.org/abs/2501.12345 or other paper URL">
+                </div>
+                <div class="form-row">
+                    <label>Direction:</label>
+                    <select id="add-paper-direction"></select>
+                    <button class="btn-fetch" id="btn-add-paper">Add</button>
+                </div>
+                <div id="add-paper-status" class="fetch-status" style="display:none;"></div>
+            </div>
+
+            <div class="fetch-form">
+                <h3>Fetch Papers from arXiv</h3>
+                <div class="form-row">
+                    <label>Direction:</label>
+                    <select id="fetch-direction"></select>
+                </div>
+                <div class="form-row">
+                    <label>Query:</label>
+                    <input type="text" id="fetch-query" placeholder="Custom query (optional, overrides default keywords)">
+                </div>
+                <div class="form-row">
+                    <label>Days:</label>
+                    <input type="number" id="fetch-days" value="30" min="1" max="365" title="Time window: how far back to search">
+                    <label>Limit:</label>
+                    <input type="number" id="fetch-limit" value="30" min="1" max="200" title="Max number of results to return">
+                    <button class="btn-fetch" id="btn-fetch">Fetch</button>
+                </div>
+                <div style="font-size:0.78rem;color:#999;margin-top:-6px;">Days = time window (how far back); Limit = max results returned. To get older papers, increase Days.</div>
+            </div>
+
+            <div id="fetch-loading" class="fetch-loading" style="display:none;">
+                <span class="spinner"></span> Fetching papers from arXiv... This may take 10-30 seconds.
+            </div>
+
+            <div id="fetch-results" style="display:none;">
+                <div class="fetch-results-header">
+                    <h2>Results: <span id="fetch-result-count">0</span> papers <span id="fetch-source" style="font-size:0.75rem;font-weight:normal;color:#666;margin-left:8px;"></span></h2>
+                    <div>
+                        <button class="btn-ingest" id="btn-ingest-all">Ingest All</button>
+                    </div>
+                </div>
+                <div id="fetch-candidates-list"></div>
+                <div style="margin-top:15px;text-align:right;">
+                    <button class="btn-ingest" id="btn-ingest-bottom">Ingest All (<span id="fetch-remaining-count">0</span>)</button>
+                </div>
+            </div>
+        </div>{# end view-fetch #}
+
+        <div id="view-notes" class="view-content" style="display:none;">
+            <div class="section">
+                <h2>My Notes</h2>
+            </div>
+
+            <div class="rn-editor" id="rn-editor">
+                <textarea id="rn-text" placeholder="Write a note..."></textarea>
+                <input type="text" id="rn-tags" placeholder="Tags (comma-separated, e.g. idea, rlhf, todo)">
+                <div class="rn-editor-actions">
+                    <button class="btn-rn-save" id="btn-rn-save">Save Note</button>
+                    <button class="btn-rn-cancel" id="btn-rn-cancel" style="display:none;">Cancel</button>
+                </div>
+            </div>
+
+            <div class="rn-filters">
+                <select id="rn-filter-tag">
+                    <option value="">All tags</option>
+                </select>
+                <label style="font-size:0.85rem;color:#666;">From:</label>
+                <input type="date" id="rn-filter-from">
+                <label style="font-size:0.85rem;color:#666;">To:</label>
+                <input type="date" id="rn-filter-to">
+                <button style="padding:4px 12px;border:1px solid #ccc;border-radius:4px;background:white;cursor:pointer;font-size:0.8rem;" id="btn-rn-clear-filters">Clear</button>
+            </div>
+
+            <div id="rn-list">
+                {% for n in random_notes %}
+                <div class="rn-card" data-rn-id="{{ n.id }}" data-rn-tags="{{ n.tags | join(',') }}" data-rn-created="{{ n.created }}">
+                    <div class="rn-text">{{ n.text }}</div>
+                    <div class="rn-tags">
+                        {% for tag in n.tags %}<span class="badge badge-tag">{{ tag }}</span>{% endfor %}
+                    </div>
+                    <div class="rn-meta">{{ n.created }}{% if n.updated != n.created %} (updated {{ n.updated }}){% endif %}</div>
+                    <div class="rn-actions">
+                        <button class="btn-rn-edit" data-id="{{ n.id }}">Edit</button>
+                        <button class="btn-rn-delete" data-id="{{ n.id }}">Delete</button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not random_notes %}
+                <p style="padding: 20px; color: #666;">No notes yet. Start writing above!</p>
+                {% endif %}
+            </div>
+        </div>{# end view-notes #}
+    </div>
+
+    <!-- Selection toolbar -->
+    <div id="selection-toolbar">
+        <div class="count"><span id="sel-count">0</span> papers selected</div>
+        <input type="text" id="nb-name" placeholder="Collection name...">
+        <button id="btn-add-nb">Add to NotebookLM</button>
+        <button id="btn-export-briefing" style="background:#0f3460;">Export Briefing</button>
+        <button id="btn-delete-selected" style="background:#dc2626;">Delete Selected</button>
+    </div>
+
+    <!-- NotebookLM modal -->
+    <div class="modal-overlay" id="nb-modal">
+        <div class="modal">
+            <h2 id="modal-title">Add to NotebookLM</h2>
+
+            <div class="step-label">Step 1: Add these URLs as sources</div>
+            <ul class="url-list" id="modal-urls"></ul>
+            <button class="btn-action" id="btn-copy-all-urls">Copy All URLs</button>
+
+            <div class="step-label" style="margin-top:20px;">Step 2: Add summary as text source</div>
+            <button class="btn-action primary" id="btn-copy-summary">Copy Summary to Clipboard</button>
+
+            <div class="step-label" style="margin-top:20px;">Step 3: Register your NotebookLM URL</div>
+            <div class="register-row">
+                <input type="text" id="nb-url-input" placeholder="https://notebooklm.google.com/notebook/...">
+                <button id="btn-save-url">Save</button>
+            </div>
+            <div class="msg-success" id="save-msg" style="display:none;"></div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn-close" id="btn-close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Briefing modal -->
+    <div class="modal-overlay" id="briefing-modal">
+        <div class="modal">
+            <h2>Export Briefing</h2>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:0.85rem;color:#666;">Briefing Title</label>
+                <input type="text" id="briefing-title" value="Research Briefing" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem;margin-top:4px;">
+            </div>
+            <div style="font-size:0.85rem;color:#666;margin-bottom:16px;" id="briefing-paper-count"></div>
+            <div id="briefing-result" style="display:none;">
+                <div class="msg-success" id="briefing-msg"></div>
+            </div>
+            <div style="margin-top:16px;text-align:right;">
+                <button class="btn-action primary" id="btn-briefing-generate">Generate</button>
+                <button class="btn-close" id="btn-briefing-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+    // Tab switching + batch dropdown
+    (function() {
+        document.querySelectorAll('.view-tabs .tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.view-tabs .tab').forEach(function(t) { t.classList.remove('active'); });
+                document.querySelectorAll('.view-content').forEach(function(v) { v.style.display = 'none'; });
+                tab.classList.add('active');
+                var view = tab.dataset.view;
+                document.getElementById('view-' + view).style.display = '';
+                var sel = document.getElementById('batch-select');
+                if (sel) sel.style.display = view === 'batch' ? 'inline-block' : 'none';
+            });
+        });
+        var batchSelect = document.getElementById('batch-select');
+        if (batchSelect) {
+            batchSelect.addEventListener('change', function() {
+                document.querySelectorAll('.batch-content').forEach(function(bc) { bc.style.display = 'none'; });
+                var el = document.getElementById('batch-' + batchSelect.value);
+                if (el) el.style.display = '';
+            });
+        }
+    })();
+
+    (function() {
+        const selected = new Set();
+        const toolbar = document.getElementById('selection-toolbar');
+        const selCount = document.getElementById('sel-count');
+        const modal = document.getElementById('nb-modal');
+        const toast = document.getElementById('toast');
+        let currentNotebookId = null;
+        let currentMarkdown = '';
+
+        // Determine API base: if served by Flask, use relative; if opened as file, prompt
+        const isServed = window.location.protocol.startsWith('http');
+
+        function updateToolbar() {
+            selCount.textContent = selected.size;
+            toolbar.classList.toggle('visible', selected.size > 0);
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 2000);
+        }
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (e) {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                return true;
+            }
+        }
+
+        // Checkbox events
+        document.querySelectorAll('.paper-cb').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const id = cb.dataset.id;
+                if (cb.checked) selected.add(id); else selected.delete(id);
+                updateToolbar();
+            });
+        });
+
+        // Select-all per direction
+        document.querySelectorAll('.select-all').forEach(sa => {
+            sa.addEventListener('change', () => {
+                const table = sa.closest('table');
+                table.querySelectorAll('.paper-cb').forEach(cb => {
+                    cb.checked = sa.checked;
+                    const id = cb.dataset.id;
+                    if (sa.checked) selected.add(id); else selected.delete(id);
+                });
+                updateToolbar();
+            });
+        });
+
+        // "Add to NotebookLM" button
+        document.getElementById('btn-add-nb').addEventListener('click', async () => {
+            if (!isServed) {
+                alert('NotebookLM integration requires the Flask server. Run: make serve');
+                return;
+            }
+            const name = document.getElementById('nb-name').value.trim() || 'Untitled Collection';
+            const paperIds = Array.from(selected);
+
+            try {
+                const resp = await fetch('/api/notebook/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({paper_ids: paperIds, name: name}),
+                });
+                const data = await resp.json();
+                if (!resp.ok) { alert(data.error || 'Error'); return; }
+
+                currentNotebookId = data.notebook_id;
+                currentMarkdown = data.markdown;
+
+                // Populate modal
+                document.getElementById('modal-title').textContent = 'Add to NotebookLM: "' + name + '"';
+                const urlList = document.getElementById('modal-urls');
+                urlList.innerHTML = '';
+                data.urls.forEach((u, i) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = '<div class="url-info">' +
+                        '<span class="url-title">' + (i+1) + '. ' + escHtml(u.title) + '</span>' +
+                        '<span class="url-text">' + escHtml(u.url || 'No URL') + '</span>' +
+                        '</div>';
+                    if (u.url) {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-copy';
+                        btn.textContent = 'Copy URL';
+                        btn.addEventListener('click', async () => {
+                            await copyText(u.url);
+                            btn.textContent = 'Copied!';
+                            btn.classList.add('copied');
+                            setTimeout(() => { btn.textContent = 'Copy URL'; btn.classList.remove('copied'); }, 1500);
+                        });
+                        li.appendChild(btn);
+                    }
+                    urlList.appendChild(li);
+                });
+
+                document.getElementById('nb-url-input').value = '';
+                document.getElementById('save-msg').style.display = 'none';
+                modal.classList.add('visible');
+            } catch (e) {
+                alert('Failed to connect to server: ' + e.message);
+            }
+        });
+
+        // Copy All URLs
+        document.getElementById('btn-copy-all-urls').addEventListener('click', async () => {
+            const urls = Array.from(document.querySelectorAll('#modal-urls .url-text'))
+                .map(el => el.textContent).filter(u => u && u !== 'No URL');
+            await copyText(urls.join('\n'));
+            showToast('All URLs copied!');
+        });
+
+        // Copy Summary
+        document.getElementById('btn-copy-summary').addEventListener('click', async () => {
+            await copyText(currentMarkdown);
+            showToast('Summary copied to clipboard!');
+        });
+
+        // Save NB URL
+        document.getElementById('btn-save-url').addEventListener('click', async () => {
+            const url = document.getElementById('nb-url-input').value.trim();
+            if (!url) return;
+            try {
+                const resp = await fetch('/api/notebook/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: currentNotebookId, url: url}),
+                });
+                const data = await resp.json();
+                if (resp.ok) {
+                    const msg = document.getElementById('save-msg');
+                    msg.textContent = 'Saved! NB link will appear on dashboard on next page load.';
+                    msg.style.display = 'block';
+                } else {
+                    alert(data.error || 'Error saving URL');
+                }
+            } catch (e) {
+                alert('Failed to save: ' + e.message);
+            }
+        });
+
+        // Close modal
+        document.getElementById('btn-close-modal').addEventListener('click', () => {
+            modal.classList.remove('visible');
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('visible');
+        });
+
+        function escHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // --- Briefing ---
+        const briefingModal = document.getElementById('briefing-modal');
+
+        document.getElementById('btn-export-briefing').addEventListener('click', () => {
+            if (!isServed) {
+                alert('Export Briefing requires the Flask server. Run: make serve');
+                return;
+            }
+            document.getElementById('briefing-title').value = document.getElementById('nb-name').value.trim() || 'Research Briefing';
+            document.getElementById('briefing-paper-count').textContent = selected.size + ' paper(s) selected';
+            document.getElementById('briefing-result').style.display = 'none';
+            briefingModal.classList.add('visible');
+        });
+
+        document.getElementById('btn-briefing-generate').addEventListener('click', async () => {
+            const title = document.getElementById('briefing-title').value.trim() || 'Research Briefing';
+            const paperIds = Array.from(selected);
+            try {
+                const resp = await fetch('/api/briefing/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({paper_ids: paperIds, title: title}),
+                });
+                const data = await resp.json();
+                if (!resp.ok) { alert(data.error || 'Error'); return; }
+                const msg = document.getElementById('briefing-msg');
+                msg.textContent = 'Briefing generated: ' + data.filename + ' (' + data.paper_count + ' papers)';
+                document.getElementById('briefing-result').style.display = '';
+                window.open('/briefing/' + data.filename, '_blank');
+                showToast('Briefing generated!');
+            } catch (e) {
+                alert('Failed to generate briefing: ' + e.message);
+            }
+        });
+
+        document.getElementById('btn-briefing-close').addEventListener('click', () => {
+            briefingModal.classList.remove('visible');
+        });
+        briefingModal.addEventListener('click', (e) => {
+            if (e.target === briefingModal) briefingModal.classList.remove('visible');
+        });
+
+        // --- Notes ---
+
+        // Load fresh paper notes from API when served by Flask
+        var notedFilterActive = false;
+        var filterBtn = document.getElementById('btn-filter-noted');
+
+        if (isServed) {
+            (async function() {
+                try {
+                    var resp = await fetch('/api/notes');
+                    var liveNotes = await resp.json();
+                    // Update all note displays, textareas, and button states
+                    document.querySelectorAll('.btn-note').forEach(function(btn) {
+                        var id = btn.dataset.id;
+                        var text = liveNotes[id] || '';
+                        btn.classList.toggle('has-note', !!text);
+                    });
+                    document.querySelectorAll('[data-note-id]').forEach(function(row) {
+                        var id = row.dataset.noteId;
+                        var text = liveNotes[id] || '';
+                        var d = row.querySelector('[data-note-display]');
+                        var t = row.querySelector('.note-textarea');
+                        if (d) { d.textContent = text; d.style.display = text ? '' : 'none'; }
+                        if (t) t.value = text;
+                    });
+                    // Update noted filter button with live count
+                    var notedCount = Object.keys(liveNotes).filter(function(k) { return !!liveNotes[k]; }).length;
+                    if (notedCount > 0) {
+                        filterBtn.style.display = '';
+                        filterBtn.textContent = 'Noted (' + notedCount + ')';
+                    } else {
+                        filterBtn.style.display = 'none';
+                    }
+                } catch (e) { /* fall back to Jinja-rendered content */ }
+            })();
+        }
+
+        // --- Direction filter ---
+        var directionFilterActive = '';  // '' = no filter, otherwise direction slug
+
+        function applyViewAllFilters() {
+            var highlightsSection = document.getElementById('section-highlights');
+            var anyFilterActive = notedFilterActive || !!directionFilterActive;
+
+            // Hide highlights when any filter is active
+            if (highlightsSection) {
+                highlightsSection.style.display = anyFilterActive ? 'none' : '';
+            }
+
+            // Show/hide direction sections
+            document.querySelectorAll('#view-all .section[data-direction]').forEach(function(sec) {
+                if (directionFilterActive && sec.dataset.direction !== directionFilterActive) {
+                    sec.style.display = 'none';
+                } else {
+                    sec.style.display = '';
+                }
+            });
+
+            // Filter rows within visible sections
+            document.querySelectorAll('#view-all .section[data-direction]').forEach(function(sec) {
+                if (sec.style.display === 'none') return;
+                sec.querySelectorAll('.paper-cb').forEach(function(cb) {
+                    var tr = cb.closest('tr');
+                    var noteRow = tr.nextElementSibling;
+                    if (notedFilterActive) {
+                        var noteBtn = tr.querySelector('.btn-note');
+                        var hasNote = noteBtn && noteBtn.classList.contains('has-note');
+                        tr.style.display = hasNote ? '' : 'none';
+                        if (noteRow && noteRow.classList.contains('note-row')) noteRow.style.display = 'none';
+                    } else {
+                        tr.style.display = '';
+                        // Keep note rows hidden (user can re-open via Note button)
+                    }
+                });
+            });
+        }
+
+        // Noted filter toggle
+        filterBtn.addEventListener('click', function() {
+            notedFilterActive = !notedFilterActive;
+            filterBtn.style.background = notedFilterActive ? '#e94560' : '#0f3460';
+            applyViewAllFilters();
+        });
+
+        // Direction card click
+        document.querySelectorAll('.stat-card-direction').forEach(function(card) {
+            card.addEventListener('click', function() {
+                var dir = card.dataset.direction;
+                if (directionFilterActive === dir) {
+                    // Toggle off
+                    directionFilterActive = '';
+                } else {
+                    directionFilterActive = dir;
+                }
+                // Update active state on cards
+                document.querySelectorAll('.stat-card-direction').forEach(function(c) {
+                    c.classList.toggle('active', c.dataset.direction === directionFilterActive);
+                });
+                // Switch to All Papers tab if not already
+                var allTab = document.querySelector('.tab[data-view="all"]');
+                if (allTab && !allTab.classList.contains('active')) {
+                    allTab.click();
+                }
+                applyViewAllFilters();
+            });
+        });
+
+        // Toggle note row on Note button click
+        document.querySelectorAll('.btn-note').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = btn.dataset.id;
+                var noteRow = btn.closest('tr').nextElementSibling;
+                if (!noteRow || noteRow.dataset.noteId !== id) return;
+
+                var isVisible = noteRow.style.display !== 'none';
+                if (isVisible) {
+                    noteRow.style.display = 'none';
+                } else {
+                    noteRow.style.display = '';
+                    if (isServed) {
+                        // Flask mode: show editor
+                        var display = noteRow.querySelector('[data-note-display]');
+                        var textarea = noteRow.querySelector('.note-textarea');
+                        var actions = noteRow.querySelector('.note-actions');
+                        if (display) display.style.display = 'none';
+                        textarea.style.display = '';
+                        actions.style.display = 'flex';
+                        textarea.focus();
+                    }
+                    // Static mode: note-display is already rendered by Jinja (read-only)
+                }
+            });
+        });
+
+        // Save note
+        document.querySelectorAll('.btn-save-note').forEach(function(btn) {
+            btn.addEventListener('click', async function() {
+                var id = btn.dataset.id;
+                var noteRow = btn.closest('tr');
+                var textarea = noteRow.querySelector('.note-textarea');
+                var text = textarea.value.trim();
+
+                var resp = await fetch('/api/notes', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({paper_id: id, text: text}),
+                });
+                if (resp.ok) {
+                    // Update all elements with the same paper ID
+                    document.querySelectorAll('[data-note-id="' + id + '"]').forEach(function(row) {
+                        var d = row.querySelector('[data-note-display]');
+                        var t = row.querySelector('.note-textarea');
+                        var a = row.querySelector('.note-actions');
+                        if (d) { d.textContent = text; d.style.display = text ? '' : 'none'; }
+                        if (t) { t.value = text; t.style.display = 'none'; }
+                        if (a) a.style.display = 'none';
+                        row.style.display = 'none';
+                    });
+                    // Update all Note buttons with same ID
+                    document.querySelectorAll('.btn-note[data-id="' + id + '"]').forEach(function(b) {
+                        b.classList.toggle('has-note', !!text);
+                    });
+                    // Update noted filter button count
+                    var notedNow = document.querySelectorAll('#view-all .btn-note.has-note').length;
+                    if (notedNow > 0) {
+                        filterBtn.style.display = '';
+                        filterBtn.textContent = 'Noted (' + notedNow + ')';
+                    } else {
+                        filterBtn.style.display = 'none';
+                        if (notedFilterActive) {
+                            notedFilterActive = false;
+                            filterBtn.style.background = '#0f3460';
+                        }
+                    }
+                    showToast('Note saved');
+                }
+            });
+        });
+
+        // Cancel note editing
+        document.querySelectorAll('.btn-cancel-note').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var noteRow = btn.closest('tr');
+                noteRow.style.display = 'none';
+            });
+        });
+
+        // --- Random Notes ---
+        var rnEditingId = null;
+
+        function populateTagFilter() {
+            var tags = new Set();
+            document.querySelectorAll('.rn-card').forEach(function(card) {
+                var t = card.dataset.rnTags;
+                if (t) t.split(',').forEach(function(tag) { if (tag.trim()) tags.add(tag.trim()); });
+            });
+            var sel = document.getElementById('rn-filter-tag');
+            var current = sel.value;
+            sel.innerHTML = '<option value="">All tags</option>';
+            Array.from(tags).sort().forEach(function(tag) {
+                var opt = document.createElement('option');
+                opt.value = tag; opt.textContent = tag;
+                sel.appendChild(opt);
+            });
+            sel.value = current;
+        }
+
+        function applyRnFilters() {
+            var tagFilter = document.getElementById('rn-filter-tag').value;
+            var fromDate = document.getElementById('rn-filter-from').value;
+            var toDate = document.getElementById('rn-filter-to').value;
+            document.querySelectorAll('.rn-card').forEach(function(card) {
+                var show = true;
+                if (tagFilter) {
+                    var tags = (card.dataset.rnTags || '').split(',');
+                    if (tags.indexOf(tagFilter) < 0) show = false;
+                }
+                if (fromDate && card.dataset.rnCreated < fromDate) show = false;
+                if (toDate && card.dataset.rnCreated > toDate) show = false;
+                card.style.display = show ? '' : 'none';
+            });
+        }
+
+        document.getElementById('rn-filter-tag').addEventListener('change', applyRnFilters);
+        document.getElementById('rn-filter-from').addEventListener('change', applyRnFilters);
+        document.getElementById('rn-filter-to').addEventListener('change', applyRnFilters);
+        document.getElementById('btn-rn-clear-filters').addEventListener('click', function() {
+            document.getElementById('rn-filter-tag').value = '';
+            document.getElementById('rn-filter-from').value = '';
+            document.getElementById('rn-filter-to').value = '';
+            applyRnFilters();
+        });
+
+        function createRnCard(n) {
+            var card = document.createElement('div');
+            card.className = 'rn-card';
+            card.dataset.rnId = n.id;
+            card.dataset.rnTags = (n.tags || []).join(',');
+            card.dataset.rnCreated = n.created;
+            var tagsHtml = (n.tags || []).map(function(t) { return '<span class="badge badge-tag">' + escHtml(t) + '</span>'; }).join('');
+            var updatedHtml = n.updated !== n.created ? ' (updated ' + escHtml(n.updated) + ')' : '';
+            card.innerHTML = '<div class="rn-text">' + escHtml(n.text) + '</div>' +
+                '<div class="rn-tags">' + tagsHtml + '</div>' +
+                '<div class="rn-meta">' + escHtml(n.created) + updatedHtml + '</div>' +
+                '<div class="rn-actions">' +
+                '<button class="btn-rn-edit" data-id="' + n.id + '">Edit</button>' +
+                '<button class="btn-rn-delete" data-id="' + n.id + '">Delete</button>' +
+                '</div>';
+            card.querySelector('.btn-rn-edit').addEventListener('click', handleRnEdit);
+            card.querySelector('.btn-rn-delete').addEventListener('click', handleRnDelete);
+            return card;
+        }
+
+        function handleRnEdit() {
+            var id = this.dataset.id;
+            var card = document.querySelector('.rn-card[data-rn-id="' + id + '"]');
+            if (!card) return;
+            rnEditingId = id;
+            document.getElementById('rn-text').value = card.querySelector('.rn-text').textContent;
+            document.getElementById('rn-tags').value = card.dataset.rnTags;
+            document.getElementById('btn-rn-cancel').style.display = '';
+            document.getElementById('rn-text').focus();
+        }
+
+        async function handleRnDelete() {
+            var id = this.dataset.id;
+            if (!confirm('Delete this note?')) return;
+            try {
+                var resp = await fetch('/api/random-notes/' + id, {method: 'DELETE'});
+                if (resp.ok) {
+                    var card = document.querySelector('.rn-card[data-rn-id="' + id + '"]');
+                    if (card) card.remove();
+                    populateTagFilter();
+                    showToast('Note deleted');
+                }
+            } catch (e) {
+                alert('Failed: ' + e.message);
+            }
+        }
+
+        document.querySelectorAll('.btn-rn-edit').forEach(function(btn) { btn.addEventListener('click', handleRnEdit); });
+        document.querySelectorAll('.btn-rn-delete').forEach(function(btn) { btn.addEventListener('click', handleRnDelete); });
+
+        document.getElementById('btn-rn-save').addEventListener('click', async function() {
+            if (!isServed) { alert('Notes require the Flask server. Run: make serve'); return; }
+            var text = document.getElementById('rn-text').value.trim();
+            if (!text) return;
+            var tags = document.getElementById('rn-tags').value.split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+            var body = {text: text, tags: tags};
+            if (rnEditingId) body.id = rnEditingId;
+            try {
+                var resp = await fetch('/api/random-notes', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body),
+                });
+                var n = await resp.json();
+                if (!resp.ok) { alert(n.error || 'Error'); return; }
+                if (rnEditingId) {
+                    var old = document.querySelector('.rn-card[data-rn-id="' + rnEditingId + '"]');
+                    if (old) old.replaceWith(createRnCard(n));
+                } else {
+                    var list = document.getElementById('rn-list');
+                    var empty = list.querySelector('p');
+                    if (empty) empty.remove();
+                    list.insertBefore(createRnCard(n), list.firstChild);
+                }
+                document.getElementById('rn-text').value = '';
+                document.getElementById('rn-tags').value = '';
+                rnEditingId = null;
+                document.getElementById('btn-rn-cancel').style.display = 'none';
+                populateTagFilter();
+                showToast(body.id ? 'Note updated' : 'Note saved');
+            } catch (e) {
+                alert('Failed: ' + e.message);
+            }
+        });
+
+        document.getElementById('btn-rn-cancel').addEventListener('click', function() {
+            rnEditingId = null;
+            document.getElementById('rn-text').value = '';
+            document.getElementById('rn-tags').value = '';
+            this.style.display = 'none';
+        });
+
+        // --- Delete Selected ---
+        document.getElementById('btn-delete-selected').addEventListener('click', async () => {
+            if (!isServed) {
+                alert('Delete requires the Flask server. Run: make serve');
+                return;
+            }
+            const paperIds = Array.from(selected);
+            if (!paperIds.length) return;
+            if (!confirm('Delete ' + paperIds.length + ' selected paper(s)? This cannot be undone.')) return;
+            try {
+                const resp = await fetch('/api/papers/delete', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({paper_ids: paperIds}),
+                });
+                const data = await resp.json();
+                if (!resp.ok) { alert(data.error || 'Delete failed'); return; }
+                showToast('Deleted ' + data.deleted + ' paper(s)');
+                setTimeout(function() { window.location.reload(); }, 800);
+            } catch (e) {
+                alert('Delete failed: ' + e.message);
+            }
+        });
+
+        // --- Fetch Tab ---
+        var fetchCandidates = [];
+        var fetchDirection = '';
+
+        // Load directions into dropdown
+        if (isServed) {
+            (async function() {
+                try {
+                    var resp = await fetch('/api/directions');
+                    var data = await resp.json();
+                    var sel = document.getElementById('fetch-direction');
+                    var addSel = document.getElementById('add-paper-direction');
+                    data.directions.forEach(function(d) {
+                        var opt = document.createElement('option');
+                        opt.value = d.slug;
+                        opt.textContent = d.name + ' (' + d.slug + ')';
+                        sel.appendChild(opt);
+                        addSel.appendChild(opt.cloneNode(true));
+                    });
+                    // Also load any pending candidates
+                    var cResp = await fetch('/api/candidates');
+                    var cData = await cResp.json();
+                    if (cData.papers && cData.papers.length > 0) {
+                        fetchCandidates = cData.papers;
+                        fetchDirection = cData.direction;
+                        renderCandidates();
+                    }
+                } catch (e) { /* ignore */ }
+            })();
+        }
+
+        document.getElementById('btn-add-paper').addEventListener('click', async function() {
+            if (!isServed) { alert('Add Paper requires the Flask server. Run: make serve'); return; }
+            var btn = this;
+            var url = document.getElementById('add-paper-url').value.trim();
+            var direction = document.getElementById('add-paper-direction').value;
+            var statusEl = document.getElementById('add-paper-status');
+
+            if (!url) { alert('Please enter a paper URL'); return; }
+            if (!direction) { alert('Please select a direction'); return; }
+
+            btn.disabled = true;
+            statusEl.style.display = '';
+            statusEl.textContent = 'Fetching paper metadata...';
+
+            try {
+                var resp = await fetch('/api/add-paper', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url: url, direction: direction}),
+                });
+                var data = await resp.json();
+                if (!resp.ok) { alert(data.error || 'Failed to add paper'); statusEl.style.display = 'none'; return; }
+
+                if (data.duplicate) {
+                    statusEl.textContent = 'Warning: This paper may already exist in the tracker. Added as candidate anyway.';
+                    statusEl.style.color = '#ca8a04';
+                } else {
+                    statusEl.textContent = 'Paper added as candidate: ' + data.paper.title;
+                    statusEl.style.color = '#16a34a';
+                }
+
+                // Add to local candidates and render
+                fetchCandidates.push(data.paper);
+                fetchDirection = direction;
+                renderCandidates();
+                document.getElementById('add-paper-url').value = '';
+                showToast('Paper added to candidates');
+            } catch (e) {
+                alert('Failed: ' + e.message);
+                statusEl.style.display = 'none';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('btn-fetch').addEventListener('click', async function() {
+            if (!isServed) { alert('Fetch requires the Flask server. Run: make serve'); return; }
+            var btn = this;
+            var direction = document.getElementById('fetch-direction').value;
+            var query = document.getElementById('fetch-query').value.trim();
+            var days = parseInt(document.getElementById('fetch-days').value) || 30;
+            var limit = parseInt(document.getElementById('fetch-limit').value) || 30;
+
+            if (!direction) { alert('Please select a direction'); return; }
+
+            btn.disabled = true;
+            document.getElementById('fetch-loading').style.display = '';
+            document.getElementById('fetch-results').style.display = 'none';
+
+            try {
+                var body = {direction: direction, days: days, limit: limit};
+                if (query) body.query = query;
+                var resp = await fetch('/api/fetch', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body),
+                });
+                var data = await resp.json();
+                if (!resp.ok) {
+                    var errMsg = data.error || 'Fetch failed';
+                    if (errMsg.indexOf('429') !== -1) {
+                        errMsg = 'arXiv rate limit (HTTP 429). Please wait 1-2 minutes and try again.';
+                    }
+                    alert(errMsg);
+                    return;
+                }
+                fetchCandidates = data.papers;
+                fetchDirection = direction;
+                renderCandidates();
+                var srcLabel = data.source === 'openalex' ? 'via OpenAlex (arXiv rate-limited)' : 'via arXiv';
+                document.getElementById('fetch-source').textContent = srcLabel;
+                showToast('Fetched ' + data.count + ' papers (' + srcLabel + ')');
+            } catch (e) {
+                alert('Fetch failed: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                document.getElementById('fetch-loading').style.display = 'none';
+            }
+        });
+
+        function renderCandidates() {
+            var container = document.getElementById('fetch-candidates-list');
+            container.innerHTML = '';
+            document.getElementById('fetch-result-count').textContent = fetchCandidates.length;
+            document.getElementById('fetch-remaining-count').textContent = fetchCandidates.length;
+            document.getElementById('fetch-results').style.display = fetchCandidates.length > 0 ? '' : 'none';
+
+            fetchCandidates.forEach(function(p, idx) {
+                var card = document.createElement('div');
+                card.className = 'candidate-card';
+                card.dataset.idx = idx;
+
+                var paperUrl = (p.links && p.links.paper) ? p.links.paper : '';
+                var titleHtml = paperUrl
+                    ? '<a href="' + escHtml(paperUrl) + '" target="_blank">' + escHtml(p.title) + '</a>'
+                    : escHtml(p.title);
+
+                var scoreVal = p.score != null ? Math.round(p.score) : '?';
+                var affHtml = (p.affiliations && p.affiliations.length > 0)
+                    ? '<span style="color:#e94560;font-weight:600;">' + escHtml(p.affiliations.join(', ')) + '</span>'
+                    : '';
+
+                card.innerHTML =
+                    '<div class="candidate-title">' +
+                        '<span class="badge badge-score">Score: ' + scoreVal + '</span> ' +
+                        titleHtml +
+                    '</div>' +
+                    '<div class="candidate-meta">' +
+                        '<span>' + escHtml((p.authors || []).slice(0, 3).join(', ')) + (p.authors && p.authors.length > 3 ? '...' : '') + '</span>' +
+                        '<span>' + escHtml(p.date || '') + '</span>' +
+                        '<span>Citations: ' + (p.citations || 0) + '</span>' +
+                        (affHtml ? '<span>' + affHtml + '</span>' : '') +
+                    '</div>' +
+                    '<div class="candidate-fields">' +
+                        '<div class="field-full">' +
+                            '<label>Core Contribution</label>' +
+                            '<textarea class="cand-core" data-idx="' + idx + '">' + escHtml(p.core_contribution || '') + '</textarea>' +
+                        '</div>' +
+                        '<div>' +
+                            '<label>Importance</label>' +
+                            '<select class="cand-importance" data-idx="' + idx + '">' +
+                                '<option value="high"' + (p.importance === 'high' ? ' selected' : '') + '>High</option>' +
+                                '<option value="medium"' + (p.importance === 'medium' || !p.importance ? ' selected' : '') + '>Medium</option>' +
+                                '<option value="low"' + (p.importance === 'low' ? ' selected' : '') + '>Low</option>' +
+                            '</select>' +
+                        '</div>' +
+                        '<div>' +
+                            '<label>Tags (comma-separated)</label>' +
+                            '<input type="text" class="cand-tags" data-idx="' + idx + '" value="' + escHtml((p.tags || []).join(', ')) + '">' +
+                        '</div>' +
+                        '<div>' +
+                            '<label>Open Source</label>' +
+                            '<div class="candidate-oss-row"><input type="checkbox" class="cand-oss" data-idx="' + idx + '"' + (p.is_open_source ? ' checked' : '') + '> <span style="font-size:0.85rem;">Yes</span></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="candidate-actions">' +
+                        '<button class="btn-remove" data-idx="' + idx + '">Remove</button>' +
+                    '</div>';
+
+                // Field change handlers
+                card.querySelector('.cand-core').addEventListener('blur', function() {
+                    updateCandidate(parseInt(this.dataset.idx), {core_contribution: this.value});
+                });
+                card.querySelector('.cand-importance').addEventListener('change', function() {
+                    updateCandidate(parseInt(this.dataset.idx), {importance: this.value});
+                });
+                card.querySelector('.cand-tags').addEventListener('blur', function() {
+                    var tags = this.value.split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+                    updateCandidate(parseInt(this.dataset.idx), {tags: tags});
+                });
+                card.querySelector('.cand-oss').addEventListener('change', function() {
+                    updateCandidate(parseInt(this.dataset.idx), {is_open_source: this.checked});
+                });
+                card.querySelector('.btn-remove').addEventListener('click', function() {
+                    removeCandidate(parseInt(this.dataset.idx), card);
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        async function updateCandidate(idx, fields) {
+            try {
+                await fetch('/api/candidates/update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({index: idx, fields: fields}),
+                });
+                // Update local copy
+                for (var k in fields) fetchCandidates[idx][k] = fields[k];
+            } catch (e) { /* silent */ }
+        }
+
+        async function removeCandidate(idx, card) {
+            try {
+                var resp = await fetch('/api/candidates/delete', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({index: idx}),
+                });
+                var data = await resp.json();
+                if (resp.ok) {
+                    fetchCandidates.splice(idx, 1);
+                    renderCandidates();
+                    showToast('Removed. ' + data.remaining + ' remaining.');
+                }
+            } catch (e) { alert('Remove failed: ' + e.message); }
+        }
+
+        async function doIngest() {
+            if (fetchCandidates.length === 0) { alert('No candidates to ingest'); return; }
+            var btns = document.querySelectorAll('.btn-ingest');
+            btns.forEach(function(b) { b.disabled = true; });
+            try {
+                var resp = await fetch('/api/ingest', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                });
+                var data = await resp.json();
+                if (!resp.ok) { alert(data.error || 'Ingest failed'); return; }
+                fetchCandidates = [];
+                document.getElementById('fetch-candidates-list').innerHTML = '';
+                document.getElementById('fetch-results').style.display = 'none';
+                showToast('Ingested ' + data.ingested + ' papers!');
+                // Switch to "All Papers" tab and reload page to see new data
+                setTimeout(function() { window.location.href = '/'; }, 800);
+            } catch (e) {
+                alert('Ingest failed: ' + e.message);
+            } finally {
+                btns.forEach(function(b) { b.disabled = false; });
+            }
+        }
+
+        document.getElementById('btn-ingest-all').addEventListener('click', doIngest);
+        document.getElementById('btn-ingest-bottom').addEventListener('click', doIngest);
+
+        // --- Table Sorting ---
+        (function() {
+            var defaultDirs = {score: 'desc', date: 'desc', title: 'asc'};
+            document.querySelectorAll('th.sortable').forEach(function(th) {
+                th.addEventListener('click', function() {
+                    var key = th.dataset.sortKey;
+                    var tbody = th.closest('table').querySelector('tbody');
+                    // Determine direction
+                    var curDir = th.classList.contains('sort-asc') ? 'asc' : th.classList.contains('sort-desc') ? 'desc' : null;
+                    var newDir;
+                    if (!curDir) {
+                        newDir = defaultDirs[key] || 'asc';
+                    } else {
+                        newDir = curDir === 'asc' ? 'desc' : 'asc';
+                    }
+                    // Clear siblings
+                    th.closest('tr').querySelectorAll('th.sortable').forEach(function(s) {
+                        s.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    th.classList.add('sort-' + newDir);
+
+                    // Collect paper rows (skip note-rows)
+                    var rows = Array.from(tbody.querySelectorAll('tr:not(.note-row)'));
+                    rows.sort(function(a, b) {
+                        var av = a.dataset['sort' + key.charAt(0).toUpperCase() + key.slice(1)] || '';
+                        var bv = b.dataset['sort' + key.charAt(0).toUpperCase() + key.slice(1)] || '';
+                        var cmp;
+                        if (key === 'score') {
+                            cmp = parseFloat(av) - parseFloat(bv);
+                        } else if (key === 'date') {
+                            cmp = av < bv ? -1 : av > bv ? 1 : 0;
+                        } else {
+                            cmp = av.localeCompare(bv);
+                        }
+                        return newDir === 'desc' ? -cmp : cmp;
+                    });
+                    // Re-append rows with their note-rows
+                    rows.forEach(function(row) {
+                        tbody.appendChild(row);
+                        var paperId = row.dataset.paperId;
+                        var noteRow = tbody.querySelector('tr.note-row[data-note-id="' + paperId + '"]');
+                        if (noteRow) tbody.appendChild(noteRow);
+                    });
+                });
+            });
+        })();
+
+        // --- Score Adjustment ---
+        document.querySelectorAll('.btn-score-adjust').forEach(function(btn) {
+            if (!isServed) { btn.style.display = 'none'; return; }
+            btn.addEventListener('click', function() {
+                var paperId = btn.dataset.id;
+                var cell = btn.closest('.score-cell');
+                var display = cell.querySelector('.score-display');
+                var computed = cell.querySelector('.score-computed');
+                var currentScore = display.textContent.trim();
+                var computedScore = cell.dataset.computed;
+
+                // Hide display elements, show editor
+                display.style.display = 'none';
+                if (computed) computed.style.display = 'none';
+                btn.style.display = 'none';
+
+                var editor = document.createElement('span');
+                editor.className = 'score-inline-editor';
+                editor.innerHTML = '<input type="number" step="0.1" value="' + currentScore + '">' +
+                    '<button class="btn-score-save">Save</button>' +
+                    '<button class="btn-score-reset">Reset</button>' +
+                    '<button class="btn-score-cancel">Cancel</button>';
+                cell.appendChild(editor);
+                editor.querySelector('input').focus();
+                editor.querySelector('input').select();
+
+                function closeEditor() {
+                    editor.remove();
+                    display.style.display = '';
+                    if (computed) computed.style.display = '';
+                    btn.style.display = '';
+                }
+
+                function updateAllCells(paperId, newScore, isAdjusted, computedVal) {
+                    document.querySelectorAll('.score-cell[data-paper-id="' + paperId + '"]').forEach(function(c) {
+                        c.querySelector('.score-display').textContent = Math.round(newScore);
+                        var comp = c.querySelector('.score-computed');
+                        if (isAdjusted) {
+                            if (!comp) {
+                                comp = document.createElement('span');
+                                comp.className = 'score-computed';
+                                c.querySelector('.score-display').after(comp);
+                            }
+                            comp.textContent = '(' + Math.round(parseFloat(computedVal)) + ')';
+                            comp.style.display = '';
+                        } else {
+                            if (comp) comp.remove();
+                        }
+                        var b = c.querySelector('.btn-score-adjust');
+                        b.classList.toggle('has-adj', isAdjusted);
+                    });
+                    // Update data-sort-score on all matching rows
+                    document.querySelectorAll('tr[data-paper-id="' + paperId + '"]').forEach(function(row) {
+                        if (!row.classList.contains('note-row')) {
+                            row.dataset.sortScore = parseFloat(newScore).toFixed(1);
+                        }
+                    });
+                }
+
+                editor.querySelector('.btn-score-save').addEventListener('click', async function() {
+                    var val = parseFloat(editor.querySelector('input').value);
+                    if (isNaN(val)) return;
+                    try {
+                        var resp = await fetch('/api/score-adjustments', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({paper_id: paperId, score: val}),
+                        });
+                        if (resp.ok) {
+                            closeEditor();
+                            updateAllCells(paperId, val, true, computedScore);
+                            showToast('Score adjusted');
+                        }
+                    } catch (e) { alert('Failed: ' + e.message); }
+                });
+
+                editor.querySelector('.btn-score-reset').addEventListener('click', async function() {
+                    try {
+                        var resp = await fetch('/api/score-adjustments', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({paper_id: paperId, score: null}),
+                        });
+                        if (resp.ok) {
+                            closeEditor();
+                            updateAllCells(paperId, parseFloat(computedScore), false, computedScore);
+                            showToast('Score reset to computed');
+                        }
+                    } catch (e) { alert('Failed: ' + e.message); }
+                });
+
+                editor.querySelector('.btn-score-cancel').addEventListener('click', closeEditor);
+            });
+        });
+
+        // Load fresh random notes from API when served by Flask
+        if (isServed) {
+            (async function() {
+                try {
+                    var resp = await fetch('/api/random-notes');
+                    var notes = await resp.json();
+                    var list = document.getElementById('rn-list');
+                    list.innerHTML = '';
+                    if (notes.length === 0) {
+                        list.innerHTML = '<p style="padding: 20px; color: #666;">No notes yet. Start writing above!</p>';
+                    } else {
+                        notes.forEach(function(n) {
+                            list.appendChild(createRnCard(n));
+                        });
+                    }
+                    // Update tab count
+                    var notesTab = document.querySelector('.tab[data-view="notes"]');
+                    if (notesTab) {
+                        notesTab.textContent = 'My Notes' + (notes.length ? ' (' + notes.length + ')' : '');
+                    }
+                } catch (e) { /* fall back to Jinja-rendered content */ }
+                populateTagFilter();
+            })();
+        } else {
+            populateTagFilter();
+        }
+    })();
+    </script>
+</body>
+</html>
