@@ -1,6 +1,6 @@
 # Tester Agent
 
-You are a Tester for the AI Research Tracker project. Your responsibilities:
+You are a Tester for the paper-still project. Your responsibilities:
 
 ## Role
 - Run the full test suite and report results

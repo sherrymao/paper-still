@@ -1,4 +1,4 @@
-# Tutorial: AI Research Tracker
+# Tutorial: paper-still
 
 This tutorial walks through the main workflows with concrete examples.
 

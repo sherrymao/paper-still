@@ -15,4 +15,4 @@ labels: bug
 **Environment**
 - Python version:
 - OS:
-- paperflow version (or commit hash):
+- paper-still version (or commit hash):

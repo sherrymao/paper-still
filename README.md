@@ -1,6 +1,6 @@
 <div align="center">
 
-# paperflow
+# paper-still
 
 **Read less. Know more. Write what matters.**
 
@@ -11,7 +11,7 @@
 
 </div>
 
-paperflow is a personal research workflow engine for AI/ML practitioners. It closes the loop from paper discovery to internalized knowledge — because you don't truly understand a paper until you can explain it in your own words.
+paper-still is a personal research workflow engine for AI/ML practitioners. It closes the loop from paper discovery to internalized knowledge — because you don't truly understand a paper until you can explain it in your own words.
 
 ```
 [arXiv] ──fetch──▶ [Candidates] ──batch──▶ [NotebookLM]
@@ -22,7 +22,7 @@ paperflow is a personal research workflow engine for AI/ML practitioners. It clo
                         │
                    discuss with LLM
                         │
-                   [paperflow notes]  ◀── the step that matters
+                   [paper-still notes]  ◀── the step that matters
 ```
 
 Your paper data and notes are gitignored — each user builds their own collection.
@@ -53,17 +53,17 @@ make serve
 
 ## The cognitive workflow
 
-Most research tools solve a discovery problem. paperflow solves a cognition problem.
+Most research tools solve a discovery problem. paper-still solves a cognition problem.
 
 You can read 50 abstracts a week and absorb almost nothing. Or you can run 50 papers through a structured pipeline — fetch, score, batch-analyze with NotebookLM, deep-read the 2–3 that matter, discuss them with an LLM, and then write notes in your own words — and own the knowledge.
 
-That final step is non-negotiable. *Generation is learning.* The note you write forces you to reconstruct the idea, expose the gaps, and make it yours. paperflow is built around that note, not around the paper.
+That final step is non-negotiable. *Generation is learning.* The note you write forces you to reconstruct the idea, expose the gaps, and make it yours. paper-still is built around that note, not around the paper.
 
 ### How it compares
 
 | Tool | Paper fetching | Workflow stages | Personal notes | arXiv integration |
 |------|---------------|-----------------|----------------|-------------------|
-| **paperflow** | Automated (arXiv) | fetch → score → batch → deep read → notes | Yes (linked to papers) | Native |
+| **paper-still** | Automated (arXiv) | fetch → score → batch → deep read → notes | Yes (linked to papers) | Native |
 | Zotero | Manual import | Collect + annotate | Yes | Plugin only |
 | Notion/Obsidian | Manual | Notes only | Yes | None |
 | Connected Papers | Discovery only | Discover | No | Partial |

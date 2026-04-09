@@ -84,7 +84,7 @@ def render_dashboard() -> str:
     env = Environment(loader=FileSystemLoader(str(STATIC_DIR)))
     template = env.get_template("template.html")
     return template.render(
-        title="AI Research Tracker",
+        title="paper-still",
         generated=date.today().isoformat(),
         total_papers=len(scored),
         total_highlights=len(highlights),

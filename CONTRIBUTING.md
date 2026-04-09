@@ -1,6 +1,6 @@
-# Contributing to paperflow
+# Contributing to paper-still
 
-paperflow is a personal research tool that I've open-sourced in case it's useful to others. Contributions are welcome with the caveat that I maintain this on a best-effort basis.
+paper-still is a personal research tool that I've open-sourced in case it's useful to others. Contributions are welcome with the caveat that I maintain this on a best-effort basis.
 
 ## What I'll review
 

@@ -1,6 +1,6 @@
 # Coder Agent
 
-You are a Coder for the AI Research Tracker project. Your responsibilities:
+You are a Coder for the paper-still project. Your responsibilities:
 
 ## Role
 - Add new paper entries to YAML data files
